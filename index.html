@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popa Cola - Factory Simulation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <p class="lab-name">Beverage Manufacturing Lab</p>
+            <h1 class="app-title">POPA COLA FACTORY SIMULATOR</h1>
+        </div>
+        <div class="header-right">
+            <span class="product-badge">🥤 Popa Cola</span>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Left Panel: Data & Timeline -->
+        <aside class="left-panel">
+            <!-- Production Status Table -->
+            <section class="data-section">
+                <div class="section-header">
+                    <h2>Production Status</h2>
+                    <button class="btn-collapse" id="toggleTable" title="Toggle table">−</button>
+                </div>
+                <div class="table-container" id="tableContainer">
+                    <table class="production-table">
+                        <thead>
+                            <tr>
+                                <th>Station</th>
+                                <th>Efficiency</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stationTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                    <div class="status-summary">
+                        <div class="summary-status">
+                            <strong id="overallStatus">✓ OPTIMAL</strong>
+                        </div>
+                        <div class="summary-details">
+                            <p id="bottleneckInfo">Bottleneck: None</p>
+                            <p id="overallThroughput">Throughput: Calculating...</p>
+                        </div>
+                        <div class="status-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: #4ade80;"></span>
+                                <span>Optimal (95-100%)</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: #facc15;"></span>
+                                <span>Caution (85-94%)</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: #ef4444;"></span>
+                                <span>Warning (70-84%)</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background: #a855f7;"></span>
+                                <span>Critical (<70%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Production Timeline -->
+            <section class="data-section">
+                <div class="section-header">
+                    <h2>Production Timeline</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="productionChart" width="250" height="150"></canvas>
+                    <div class="chart-label">
+                        <span id="currentRate">0 cans/min</span>
+                        <span id="elapsedTime">00:00</span>
+                    </div>
+                </div>
+            </section>
+        </aside>
+
+        <!-- Center: 3D Visualization -->
+        <section class="canvas-section">
+            <div id="canvas-container" class="canvas-container">
+                <!-- Three.js canvas will be inserted here -->
+            </div>
+
+            <!-- Metrics Overlay (Top Right) -->
+            <div class="metrics-overlay">
+                <div class="metric-box">
+                    <label>Production Rate</label>
+                    <strong id="metricRate">0</strong>
+                    <span>cans/min</span>
+                </div>
+                <div class="metric-box">
+                    <label>Cycle Time</label>
+                    <strong id="metricCycle">0.0</strong>
+                    <span>min</span>
+                </div>
+                <div class="metric-box">
+                    <label>Fill Level</label>
+                    <strong id="metricFill">0.0</strong>
+                    <span>%</span>
+                </div>
+                <div class="metric-box">
+                    <label>Total Produced</label>
+                    <strong id="metricTotal">0</strong>
+                    <span>cans</span>
+                </div>
+            </div>
+
+            <!-- Control Buttons (Top Right Corner) -->
+            <div class="control-buttons">
+                <button class="btn-icon" id="btnControls" title="Open controls">☰</button>
+                <button class="btn-icon" id="btnReset" title="Reset camera">↻</button>
+                <button class="btn-icon" id="btnFullscreen" title="Fullscreen">⛶</button>
+                <button class="btn-icon" id="btnHideUI" title="Hide interface">◉</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Control Panel (Slide-out Sidebar) -->
+    <aside class="control-panel" id="controlPanel">
+        <div class="panel-header">
+            <h2>Simulation Controls</h2>
+            <button class="btn-close" id="closePanel">×</button>
+        </div>
+
+        <div class="control-group">
+            <label for="sliderSpeed">Production Speed</label>
+            <div class="slider-wrapper">
+                <input type="range" id="sliderSpeed" min="0.5" max="2.0" step="0.1" value="1.0">
+                <span class="slider-value" id="speedValue">1.0x</span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="sliderBatch">Cans Per Batch</label>
+            <div class="slider-wrapper">
+                <input type="range" id="sliderBatch" min="10" max="200" step="10" value="50">
+                <span class="slider-value" id="batchValue">50</span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="sliderDuration">Simulation Duration</label>
+            <div class="slider-wrapper">
+                <input type="range" id="sliderDuration" min="10" max="120" step="10" value="60">
+                <span class="slider-value" id="durationValue">60 s</span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="selectMode">Production Mode</label>
+            <select id="selectMode">
+                <option value="standard">Standard</option>
+                <option value="express">Express</option>
+                <option value="testing">Testing</option>
+            </select>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" id="btnStart">START PRODUCTION</button>
+            <button class="btn-secondary" id="btnReset2">RESET</button>
+        </div>
+
+        <p class="control-help">Adjust parameters and start the simulation. Watch the 3D factory in action!</p>
+    </aside>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script type="module" src="src/app.js"></script>
+</body>
+</html>
